@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consulta de registros - DEMO</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: #f3f5f9;
+    font-family: Arial, sans-serif;
+    color: #172d42;
+}
+
+.top {
+    height: 56px;
+    
+	
+}
+
+.banner {
+    max-width: 1012px;
+    margin: 16px auto 40px;
+    height: 135px;
+    display: flex;
+    align-items: center;
+    background: #38584f;
+    color: white;
+}
+
+.logo {
+    height: 100%;
+    width: 48%;
+    background: #f4f3e9;
+    color: #38584f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 23px;
+    text-align: center;
+}
+
+.banner h1 {
+    font-size: 36px;
+    font-weight: 300;
+    padding-left: 30px;
+    margin: 0;
+}
+
+.banner small {
+    font-size: 22px;
+    color: #b8cbc6;
+}
+
+.notice {
+    max-width: 710px;
+    margin: auto;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 960px;
+    margin: 16px auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px #ccc;
+}
+
+.heading {
+    background: #285343;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.content { padding: 20px; }
+
+.info {
+    font-size: 12px;
+    color: #64748b;
+    margin: 20px 0 30px;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: 2fr .7fr 1.4fr;
+    gap: 10px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+input, select {
+    width: 100%;
+    height: 39px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 15px;
+}
+
+button {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: #285343;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:hover { background: #193d32; }
+
+.resultado {
+    padding: 16px;
+    margin-top: 20px;
+    border-radius: 4px;
+    background: #e5f5e9;
+    color: #176534;
+    border: 1px solid #b7dfc2;
+}
+
+.error {
+    background: #fce8e8;
+    color: #a32020;
+    border-color: #efbbbb;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+}
+
+.aviso {
+    text-align: center;
+    color: #a13e25;
+    font-size: 11px;
+    margin: 15px;
+}
+
+@media(max-width:700px) {
+    .banner { margin: 10px; height: 110px; }
+    .logo { font-size: 16px; }
+    .banner h1 { font-size: 23px; padding-left: 12px; }
+    .banner small { font-size: 15px; }
+    .fields { grid-template-columns: 1fr; }
+    .container { margin: 10px; }
+    .notice { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="top"></div>
+
+<div class="banner"><img src="img/base_cursos.png" width="987" height="128">
+
+</div>
+
+<div class="aviso">
+    
+</div>
+
+<div class="notice">
+    <strong>Importante:</strong>
+    Ingrese sus datos personales para consultar
+    si existe un registro en la base de datos local.
+</div>
+
+<div class="container">
+
+    <div class="heading">DATOS PERSONALES</div>
+
+    <div class="content">
+
+        <p class="info">
+            <strong>Información:</strong>
+            Ingrese su número de Cédula de Identidad,
+            lugar de expedición y fecha de nacimiento.
+        </p>
+
+        <form id="formulario">
+
+            <div class="fields">
+
+                <div>
+                    <label>Cédula de Identidad</label>
+                    <input id="cedula" type="text"
+                    placeholder="Ej. 1234567" required>
+                </div>
+
+                <div>
+                    <label>Expedido</label>
+                    <select id="expedido" required>
+                        <option value="">Seleccionar</option>
+                        <option value="LP">LP - La Paz</option>
+                        <option value="CB">CB - Cochabamba</option>
+                        <option value="SC">SC - Santa Cruz</option>
+                        <option value="OR">OR - Oruro</option>
+                        <option value="PT">PT - Potosi</option>
+                        <option value="TJ">TJ - Tarija</option>
+                        <option value="CH">CH - Chuquisaca</option>
+                        <option value="BE">BE - Beni</option>
+                        <option value="PA">PA - Pando</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Fecha de Nacimiento</label>
+                    <input id="nacimiento" type="date" required>
+                </div>
+
+            </div>
+
+            <button type="submit">
+                BUSCAR CERTIFICADOS
+            </button>
+
+        </form>
+
+        <div id="resultado"></div>
+
+    </div>
+</div>
+
+<footer>
+    Sistema de consulta local - 2026
+</footer>
+
+<script>
+
+// BASE DE DATOS LOCAL
+const DB_KEY = "base_usuarios_demo";
+
+// Usuario de demostración precargado
+
+const usuariosIniciales = [
+    {
+        cedula: "5788641",
+        expedido: "TJ",
+        nacimiento: "1984-09-08"
+    },
+    {
+        cedula: "6263845",
+        expedido: "SC",
+        nacimiento: "1983-12-08"
+    }
+];
+
+
+// Inicializar base local
+
+function inicializarDB() {
+
+    let usuarios = JSON.parse(
+        localStorage.getItem(DB_KEY) || "[]"
+    );
+
+    usuariosIniciales.forEach(nuevo => {
+
+        const existe = usuarios.some(
+            usuario => usuario.cedula === nuevo.cedula
+        );
+
+        if (!existe) {
+            usuarios.push(nuevo);
+        }
+
+    });
+
+    localStorage.setItem(
+        DB_KEY,
+        JSON.stringify(usuarios)
+    );
+}
+
+// Buscar usuario
+document.getElementById("formulario")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const cedula = document.getElementById("cedula")
+        .value.trim();
+
+    const expedido = document.getElementById("expedido")
+        .value;
+
+    const nacimiento = document.getElementById("nacimiento")
+        .value;
+
+    const usuarios = JSON.parse(
+        localStorage.getItem(DB_KEY) || "[]"
+    );
+
+    const encontrado = usuarios.find(usuario =>
+        usuario.cedula === cedula &&
+        usuario.expedido === expedido &&
+        usuario.nacimiento === nacimiento
+    );
+
+    const resultado = document.getElementById("resultado");
+
+
+if (encontrado) {
+
+    resultado.innerHTML = `
+        <div class="resultado">
+            <h3>REGISTRO ENCONTRADO</h3>
+            <p>El usuario existe en la base de datos.</p>
+            <strong>Estado: EXISTENTE</strong>
+            <p>Abriendo certificado PDF...</p>
+            <a href="certificados/${encodeURIComponent(cedula)}.pdf"
+               target="_blank"
+               rel="noopener">
+               ABRIR CERTIFICADO PDF
+            </a>
+        </div>
+    `;
+
+    // Abrir automáticamente el PDF
+    window.open(
+        "certificados/" + encodeURIComponent(cedula) + ".pdf",
+        "_blank"
+    );
+
+} else {
+
+    resultado.innerHTML = `
+        <div class="resultado error">
+            <h3>REGISTRO NO ENCONTRADO</h3>
+            <p>No existe un usuario que coincida
+            con los datos ingresados.</p>
+            <strong>Estado: NO EXISTENTE</strong>
+        </div>
+    `;
+
+}
+
+
+});
+
+// Crear base al abrir
+inicializarDB();
+
+</script>
+
+</body>
+</html>
